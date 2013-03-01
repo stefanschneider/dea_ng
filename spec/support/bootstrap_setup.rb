@@ -15,6 +15,7 @@ shared_context "bootstrap_setup" do
         "heartbeat" => 0.01,
       },
       "runtimes" => %w[test1 test2],
+      "stacks" => ["warden"],
       "directory_server" => {
         "v1_port" => 12345,
         "v2_port" => 23456,

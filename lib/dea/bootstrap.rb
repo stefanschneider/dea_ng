@@ -66,6 +66,7 @@ module Dea
       validate_config
 
       setup_logging
+      setup_stacks
       setup_droplet_registry
       setup_resource_manager
       setup_instance_registry
@@ -105,6 +106,25 @@ module Dea
       end
 
       Steno.init(Steno::Config.new(options))
+    end
+
+    attr_reader :stacks
+
+    def setup_stacks
+      stacks = config["stacks"]
+
+      if stacks.empty?
+        logger.fatal "No stacks configured"
+        exit 1
+      end
+
+      @stacks = stacks.sort
+
+      nil
+    end
+
+    def supported_stack?(stack)
+      @stacks.index(stack) != nil
     end
 
     attr_reader :droplet_registry
@@ -521,9 +541,13 @@ module Dea
     end
 
     def handle_dea_discover(message)
+      stack = message.data["stack"]
       rs = message.data["limits"]
 
-      unless resource_manager.could_reserve?(rs["mem"], rs["disk"], 1)
+      if !supported_stack?(stack)
+        logger.info("Unsupported stack '#{stack}'")
+        return
+      elsif !resource_manager.could_reserve?(rs["mem"], rs["disk"], 1)
         logger.info("Couldn't accomodate resource request")
         return
       end

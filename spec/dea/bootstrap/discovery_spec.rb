@@ -8,6 +8,7 @@ describe Dea do
 
   before do
     bootstrap.unstub(:setup_directory_server)
+    bootstrap.stub(:supported_stack?).with("warden").and_return(true)
   end
 
   it "should publish a message on 'vcap.component.announce' on startup" do
@@ -77,6 +78,28 @@ describe Dea do
       end
 
       verify_hello_message(bootstrap, received_message)
+    end
+
+    it "should not respond to unsupported stacks" do
+      received_message = false
+
+      expect {
+        em(:timeout => 1) do
+          bootstrap.setup
+          bootstrap.start
+
+          bootstrap.stub(:supported_stack?).with("unsupported").and_return(false)
+
+          req = discover_message("stack" => "unsupported")
+          nats_mock.request("dea.discover", req) do
+            received_message = true
+            done
+          end
+
+        end
+      }.to raise_error(RuntimeError, "timeout")
+
+      received_message.should be_false
     end
 
     it "should not respond if insufficient resources" do
@@ -208,7 +231,8 @@ describe Dea do
       "limits"  => {
         "mem"  => 10,
         "disk" => 10,
-      }
+      },
+      "stack" => "warden"
     }.merge(opts)
   end
 

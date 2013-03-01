@@ -16,6 +16,9 @@ nats_uri: nats://localhost:4222/
 
 pid_filename: /tmp/dea_ng.pid
 
+stacks:
+  - warden
+
 warden_socket: /tmp/warden.sock
 
 index: 0

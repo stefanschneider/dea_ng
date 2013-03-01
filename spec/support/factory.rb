@@ -27,6 +27,8 @@ module Helpers
       "application_name"    => "my_application",
       "application_uris"    => ["foo.com", "bar.com"],
 
+      "stack"               => "warden",
+
       "droplet_sha1"        => "deadbeef",
       "droplet_uri"         => "http://foo.com/file.ext",
 

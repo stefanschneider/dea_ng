@@ -69,6 +69,8 @@ module Dea
         application_version
         application_name
         application_uris
+
+        stack
       ]
 
       # TODO(kowshik): Eliminate application_users as it is deprecated.
@@ -92,6 +94,7 @@ module Dea
       hash["uris"]            = hash["application_uris"]
       hash["users"]           = hash["application_users"]
 
+      hash["stack"]         = hash["stack"]
       hash["start"]           = hash["started_at"]
       hash["state_timestamp"] = hash["started_at_timestamp"]
 

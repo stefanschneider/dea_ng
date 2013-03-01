@@ -39,6 +39,8 @@ describe Dea::Env do
       "droplet_sha1"        => "deadbeef",
       "droplet_uri"         => "http://foo.com/file.ext",
 
+      "stack"        => "warden",
+
       "limits"              => { "mem" => 1, "disk" => 2, "fds" => 3 },
       "environment"         => { "FOO" => "BAR" },
       "services"            => { "name" => "redis", "type" => "redis" },
@@ -184,6 +186,8 @@ describe Dea::Env do
       application_name
       application_uris
       application_users
+
+      stack
     )
 
     keys.each do |key|
@@ -249,6 +253,10 @@ describe Dea::Env do
       }
     end
 
+    let(:stack) do
+      "warden"
+    end
+
     let(:env) do
       subject.env
     end
@@ -266,6 +274,7 @@ describe Dea::Env do
       instance.stub(:services).and_return([service])
 
       instance.stub(:debug).and_return(nil)
+      instance.stub(:stack).and_return(stack)
 
       instance.stub(:environment).and_return({ "ENVIRONMENT" => "yep" })
       instance.stub(:bootstrap).and_return do

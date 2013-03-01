@@ -87,6 +87,18 @@ module Dea
       end
     end
 
+    class StackNotFoundError < BaseError
+      attr_reader :data
+
+      def initialize(stack)
+        @data = { :stack => stack }
+      end
+
+      def message
+        "Stack not supported: #{data[:stack].inspect}"
+      end
+    end
+
     class TransitionError < BaseError
       attr_reader :from
       attr_reader :to
@@ -186,7 +198,9 @@ module Dea
           optional("runtime_name")   => String,
           optional("runtime_info")   => dict(String, any),
           optional("framework_name") => String,
-
+          
+          "stack"   => String,
+          
           # TODO: use proper schema
           "limits"              => limits_schema,
           "environment"         => dict(String, String),
@@ -318,6 +332,13 @@ module Dea
 
     def validate
       self.class.schema.validate(@attributes)
+
+      # Check if the runtime is available
+      unless bootstrap.supported_stack?(self.stack)
+        error = StackNotFoundError.new(self.stack)
+        logger.warn(error.message, error.data)
+        raise error
+      end
     end
 
     def state

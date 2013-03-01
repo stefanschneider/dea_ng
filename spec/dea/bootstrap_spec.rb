@@ -13,7 +13,8 @@ describe Dea::Bootstrap do
       "directory_server" => {
         "v1_port" => 12345,
       },
-      "domain" => "default"
+      "domain" => "default",
+      "stacks" => ["warden"]
     }
   end
 
@@ -265,6 +266,26 @@ describe Dea::Bootstrap do
         droplet_registry[sha].should_receive(:destroy)
       end
       bootstrap.reap_unreferenced_droplets
+    end
+  end
+
+  describe "#stacks" do
+    before do
+      bootstrap.setup_stacks
+    end
+
+    it "returns supported stacks" do
+      bootstrap.stacks.should == ["warden"]
+    end
+  end
+
+  describe "#supported_stack?" do
+    before do
+      bootstrap.setup_stacks
+    end
+
+    it "returns supported stacks" do
+      bootstrap.supported_stack?("unsupported").should be_false
     end
   end
 

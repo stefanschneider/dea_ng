@@ -29,6 +29,7 @@ module Dea
           "only_production_apps" => bool,
           "nats_uri" => String,
           "pid_filename" => String,
+          "stacks" => [String],
           "warden_socket" => String,
           "index" => Integer,
 

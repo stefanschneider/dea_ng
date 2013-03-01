@@ -72,6 +72,18 @@ describe Dea::Instance do
       its(:droplet_uri)  { should == "http://foo.com/file.ext" }
     end
 
+
+    describe "stack attributes" do
+      let(:start_message_data) do
+        {
+          "stack"   => "warden"
+        }
+      end
+
+      its(:stack)   { should == "warden" }
+    end
+
+
     describe "other attributes" do
       let(:start_message_data) do
         {
@@ -108,6 +120,11 @@ describe Dea::Instance do
   end
 
   describe "validation" do
+    before do
+      bootstrap.stub(:supported_stack?).with("warden").and_return(true)
+      bootstrap.stub(:supported_stack?).with("not_found").and_return(false)
+    end
+
     it "should not raise when the attributes are valid" do
       instance = Dea::Instance.new(bootstrap, valid_instance_attributes)
 
@@ -128,6 +145,16 @@ describe Dea::Instance do
       instance = Dea::Instance.new(bootstrap, attributes)
 
       expect { instance.validate }.to raise_error
+     end
+
+    it "should raise when the stack is not found" do
+      attributes = valid_instance_attributes.dup
+      attributes["stack"] = "not_found"
+      instance = Dea::Instance.new(bootstrap, attributes)
+
+      expect do
+        instance.validate
+      end.to raise_error(Dea::Instance::StackNotFoundError)
     end
   end
 
